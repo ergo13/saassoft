@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
 import { DeleteOutlined } from '@ant-design/icons-vue'
 import { type AccountForm, AccountType } from '@/stores/accountList'
@@ -40,15 +40,17 @@ const formatedLabel = computed(() => {
 })
 
 const labelInputHandler = async (label: string) => {
-  const onlySemicolon = /^[a-zA-Z0-9\s;]*$/
-  const sanitizeLabel = label.replace(/^;+|;+$/g, '')
+  const notAllowed = /[^a-zA-Z0-9;]/g
+  const squashSemi = /;{2,}/g
+  const sanitizeLabel = label.replace(notAllowed, '').replace(squashSemi, ';')
 
-  if (onlySemicolon.test(sanitizeLabel)) {
-    const labelArr = sanitizeLabel.split(';').map((label) => ({ text: label }))
-    localAccount.value.label = labelArr
-  } else {
-    errors.value.label = 'Недоспустимый разделитель'
+  const labelArr = sanitizeLabel.split(';').map((label) => ({ text: label }))
+  if (formatedLabel.value === sanitizeLabel) {
+    localAccount.value.label = []
+    await nextTick()
   }
+
+  localAccount.value.label = labelArr
 }
 
 const typeChangeHandle = (type: AccountType) => {
