@@ -24,14 +24,14 @@ export const useAccountStore = defineStore('accountList', () => {
   const accountList = ref<AccountForm[]>(storedAccounts ? JSON.parse(storedAccounts) : [])
 
   const addAccount = () => {
-    const uuid = ref<number>(Date.now())
+    const uuid = Date.now()
 
     const newAccount: AccountForm = {
       label: [],
       type: AccountType.LOCAL,
       login: '',
       password: null,
-      uuid: uuid.value,
+      uuid: uuid,
     }
     accountList.value.push(newAccount)
   }
