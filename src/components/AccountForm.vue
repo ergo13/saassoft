@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, nextTick, toRaw } from 'vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
 import { DeleteOutlined } from '@ant-design/icons-vue'
 import { type AccountForm, AccountType } from '@/stores/accountList'
@@ -14,7 +14,7 @@ const emits = defineEmits<{
 const errors = ref<Record<string, string>>({})
 
 const updateEmithandler = (updates: Partial<AccountForm>) => {
-  const oldAccount = JSON.parse(JSON.stringify(props.account))
+  const oldAccount = structuredClone(toRaw(props.account))
   emits('update-account', { ...oldAccount, ...updates })
 }
 
@@ -43,9 +43,8 @@ const formatedLabel = computed(() => {
 })
 
 const labelInputHandler = async (label: string) => {
-  const notAllowed = /[^a-zA-Z0-9;]/g
   const squashSemi = /;{2,}/g
-  const sanitizeLabel = label.replace(notAllowed, '').replace(squashSemi, ';')
+  const sanitizeLabel = label.replace(squashSemi, ';')
 
   const labelArr = sanitizeLabel.split(/;(?=.)/).map((label) => ({ text: label }))
   if (formatedLabel.value === sanitizeLabel) {
