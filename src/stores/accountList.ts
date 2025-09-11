@@ -1,5 +1,6 @@
 import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
+import { debounce } from '@/utils/debounce'
 
 export interface FormLabel {
   text: string
@@ -37,9 +38,9 @@ export const useAccountStore = defineStore('accountList', () => {
 
   watch(
     accountList,
-    () => {
+    debounce(() => {
       localStorage.setItem('accounts', JSON.stringify(accountList.value))
-    },
+    }, 300),
     { deep: true },
   )
 
