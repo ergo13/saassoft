@@ -46,7 +46,10 @@ const labelInputHandler = async (label: string) => {
   const squashSemi = /;{2,}/g
   const sanitizeLabel = label.replace(squashSemi, ';')
 
-  const labelArr = sanitizeLabel.split(/;(?=.)/).map((label) => ({ text: label }))
+  const labelArr = sanitizeLabel
+    .split(/;/)
+    .filter((label) => !!label)
+    .map((label) => ({ text: label }))
   if (formatedLabel.value === sanitizeLabel) {
     updateEmithandler({ label: [] })
     await nextTick()
