@@ -67,7 +67,7 @@ const typeChangeHandle = (type: AccountType) => {
       :autoSize="true"
       name="accout-label"
       placeholder="Значение"
-      @input="labelInputHandler($event.target.value)"
+      @blur="labelInputHandler($event.target.value)"
     />
 
     <a-select :value="props.account.type" @change="typeChangeHandle($event)">
