@@ -18,6 +18,18 @@ const updateEmithandler = (updates: Partial<AccountForm>) => {
   emits('update-account', { ...oldAccount, ...updates })
 }
 
+const inputBlurHandler = async (updates: Partial<AccountForm>, filedName: string) => {
+  try {
+    const accountUpdates = await validationSchema.validate(updates)
+    errors.value[filedName] = ''
+    updateEmithandler(accountUpdates)
+  } catch (error) {
+    if (error instanceof Error) {
+      errors.value[filedName] = error.message
+    }
+  }
+}
+
 const validationSchema = yup.object({
   login: yup.string().required('Обязательное поле'),
   password: yup.string().when('type', {
@@ -26,17 +38,6 @@ const validationSchema = yup.object({
     otherwise: (validationSchema) => validationSchema.nullable(),
   }),
 })
-
-const validateField = async (field: string) => {
-  try {
-    await validationSchema.validateAt(field, props.account)
-    errors.value[field] = ''
-  } catch (error) {
-    if (error instanceof Error) {
-      errors.value[field] = error.message
-    }
-  }
-}
 
 const formatedLabel = computed(() => {
   return props.account.label.map((item) => item.text).join(';')
@@ -84,8 +85,7 @@ const typeChangeHandle = (type: AccountType) => {
           hasError: errors.login,
         }"
         placeholder="Значение"
-        @input="updateEmithandler({ login: $event.target.value })"
-        @blur="validateField('login')"
+        @blur="inputBlurHandler({ login: $event.target.value }, 'login')"
       />
 
       <PasswordInput
@@ -96,8 +96,7 @@ const typeChangeHandle = (type: AccountType) => {
         :maxlength="100"
         :value="props.account.password"
         name="account-password"
-        @input="updateEmithandler({ password: $event.target.value })"
-        @blur="validateField('password')"
+        @blur="inputBlurHandler({ password: $event.target.value }, 'password')"
       />
     </div>
 
